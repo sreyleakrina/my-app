@@ -3,19 +3,19 @@ const cors = require('cors');
 const { Pool } = require('pg');
 
 const app = express();
-const PORT = 5000; // Express API រត់លើ Port 5000
+// អនុញ្ញាតឱ្យ Render កំណត់ Port តាម Environment Variable
+const PORT = process.env.PORT || 5000;
 
-// បើក CORS ឱ្យ Frontend ពី Port 3001 អាចហៅមក Backend បាន
+// បើក CORS ឱ្យគ្រប់ Domain (រួមទាំង Frontend លើ Render) អាចហៅមកបាន
 app.use(cors());
 app.use(express.json());
 
-// ភ្ជាប់ទៅកាន់ PostgreSQL Database លើ Port 5433 (Docker)
+// កំណត់ Configuration សម្រាប់ភ្ជាប់ Database ឱ្យត្រូវជាមួយ Render
+const isProduction = process.env.NODE_ENV === 'production' || process.env.DATABASE_URL;
+
 const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5433,
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || '123456',
-  database: process.env.DB_NAME || 'mydb',
+  connectionString: process.env.DATABASE_URL || `postgresql://${process.env.DB_USER || 'postgres'}:${process.env.DB_PASSWORD || '123456'}@${process.env.DB_HOST || 'localhost'}:${process.env.DB_PORT || 5433}/${process.env.DB_NAME || 'mydb'}`,
+  ssl: isProduction ? { rejectUnauthorized: false } : false // Render PostgreSQL តម្រូវឱ្យប្រើ SSL
 });
 
 // Auto Create Table & Seed Default User
@@ -49,7 +49,7 @@ app.get('/', (req, res) => {
   res.json({
     status: "success",
     message: "🚀 Backend Connected to PostgreSQL Successfully!",
-    environment: "development"
+    environment: isProduction ? "production" : "development"
   });
 });
 
@@ -132,6 +132,6 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Backend API running on http://localhost:${PORT}`);
+  console.log(`🚀 Backend API running on port ${PORT}`);
   initDB();
 });
