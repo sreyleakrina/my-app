@@ -1,8 +1,7 @@
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3001; // អនុញ្ញាតឱ្យ Render កំណត់ Port ដោយស្វ័យប្រវត្តិ
+const PORT = process.env.PORT || 3001;
 
-// ទាញយក Backend URL ពី Environment Variable (បើគ្មាន ប្រើ localhost:5000)
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 app.get('/', (req, res) => {
@@ -58,8 +57,8 @@ app.get('/', (req, res) => {
   <script>
     const alertMsg = document.getElementById('alert-msg');
     
-    // ចាក់តម្លៃ BACKEND_URL ចូលក្នុង Client-side Script
-    const API_URL = "${BACKEND_URL}";
+    // ចាក់តម្លៃ URL ដោយផ្ទាល់
+    const API_URL = "` + BACKEND_URL + `";
 
     function showAlert(msg, isSuccess) {
       alertMsg.style.display = 'block';
