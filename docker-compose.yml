@@ -1,0 +1,44 @@
+services:
+  # 1.1 Database (PostgreSQL)
+  postgres_db:
+    image: postgres:15-alpine
+    container_name: my_db
+    restart: always
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+
+  # 1.2 Backend API
+  backend:
+    build: ./backend
+    container_name: my_backend
+    restart: always
+    ports:
+      - "5000:5000" # 💡 កែមក Port 5000 ដើម្បីឱ្យត្រូវជាមួយកូដ index.js (PORT = 5000)
+    environment:
+      PORT: 5000
+      DB_HOST: postgres_db
+      DB_PORT: 5432
+      DB_USER: myuser
+      DB_PASSWORD: mypassword
+      DB_NAME: mydb
+    depends_on:
+      - postgres_db
+
+  # 1.3 Frontend
+  frontend:
+    build: ./frontend
+    container_name: my_frontend
+    restart: always
+    ports:
+      - "3001:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:
