@@ -1,6 +1,9 @@
 const express = require('express');
 const app = express();
-const PORT = 3001; // Frontend UI រត់លើ Port 3001
+const PORT = process.env.PORT || 3001; // អនុញ្ញាតឱ្យ Render កំណត់ Port ដោយស្វ័យប្រវត្តិ
+
+// ទាញយក Backend URL ពី Environment Variable (បើគ្មាន ប្រើ localhost:5000)
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 app.get('/', (req, res) => {
   res.send(`
@@ -52,11 +55,11 @@ app.get('/', (req, res) => {
     <div id="alert-msg"></div>
   </div>
 
-<script>
+  <script>
     const alertMsg = document.getElementById('alert-msg');
     
-    // ហៅយក URL របស់ Backend ពី Environment Variable (បើគ្មាន ប្រើ localhost)
-    const BACKEND_URL = '${process.env.BACKEND_URL || "http://localhost:5000"}';
+    // ចាក់តម្លៃ BACKEND_URL ចូលក្នុង Client-side Script
+    const API_URL = "${BACKEND_URL}";
 
     function showAlert(msg, isSuccess) {
       alertMsg.style.display = 'block';
@@ -70,7 +73,7 @@ app.get('/', (req, res) => {
       const password = document.getElementById('password').value.trim();
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/login`, {
+        const response = await fetch(API_URL + '/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -89,7 +92,7 @@ app.get('/', (req, res) => {
       const password = document.getElementById('password').value.trim();
 
       try {
-        const response = await fetch(`${BACKEND_URL}/api/register`, {
+        const response = await fetch(API_URL + '/api/register', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -108,5 +111,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 Frontend Web UI running on http://localhost:${PORT}`);
+  console.log(`🚀 Frontend Web UI running on port ${PORT}`);
 });
