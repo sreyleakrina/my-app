@@ -52,8 +52,11 @@ app.get('/', (req, res) => {
     <div id="alert-msg"></div>
   </div>
 
-  <script>
+<script>
     const alertMsg = document.getElementById('alert-msg');
+    
+    // ហៅយក URL របស់ Backend ពី Environment Variable (បើគ្មាន ប្រើ localhost)
+    const BACKEND_URL = '${process.env.BACKEND_URL || "http://localhost:5000"}';
 
     function showAlert(msg, isSuccess) {
       alertMsg.style.display = 'block';
@@ -61,13 +64,13 @@ app.get('/', (req, res) => {
       alertMsg.innerText = msg;
     }
 
-    // Login (ហៅទៅ Backend Port 5000)
+    // Login
     document.getElementById('btnLogin').addEventListener('click', async () => {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
       try {
-        const response = await fetch('http://localhost:5000/api/login', {
+        const response = await fetch(`${BACKEND_URL}/api/login`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -76,17 +79,17 @@ app.get('/', (req, res) => {
         const result = await response.json();
         showAlert(result.message, response.ok && result.success);
       } catch (error) {
-        showAlert('មិនអាចភ្ជាប់ទៅកាន់ Backend Server (Port 5000) បានទេ!', false);
+        showAlert('មិនអាចភ្ជាប់ទៅកាន់ Backend Server បានទេ!', false);
       }
     });
 
-    // Register (ហៅទៅ Backend Port 5000)
+    // Register
     document.getElementById('btnRegister').addEventListener('click', async () => {
       const email = document.getElementById('email').value.trim();
       const password = document.getElementById('password').value.trim();
 
       try {
-        const response = await fetch('http://localhost:5000/api/register', {
+        const response = await fetch(`${BACKEND_URL}/api/register`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
